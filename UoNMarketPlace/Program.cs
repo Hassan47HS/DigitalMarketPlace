@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using UoNMarketPlace.DataContext;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
+builder.Services.AddDbContext<UoNDB>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("UoNcs")));
+builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<UoNDB>().AddDefaultTokenProviders();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,9 +22,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Login}/{action=Login}/{id?}");
 app.Run();
