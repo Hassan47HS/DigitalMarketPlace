@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UoNMarketPlace.DataContext;
 
@@ -11,9 +12,11 @@ using UoNMarketPlace.DataContext;
 namespace UoNMarketPlace.Migrations
 {
     [DbContext(typeof(UoNDB))]
-    partial class UoNDBModelSnapshot : ModelSnapshot
+    [Migration("20240930182915_addRole")]
+    partial class addRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -14,7 +14,8 @@ namespace UoNMarketPlace.Model
         Student,
         Faculty,
         staff,
-        alumini
+        alumini,
+        Admin
     }
     public enum Gender
     {
