@@ -1,0 +1,101 @@
+﻿@model UoNMarketPlace.ViewModel.sellViewModel
+
+@{
+    ViewData["Title"] = "Sell a Product";
+    Layout = null;
+
+}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - UoNMarketPlace</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-page="/LandingPage">UoNMarketPlace</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="productDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Product
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="productDropdown">
+                                <li><a class="dropdown-item" asp-action="Sell" asp-controller="Product">Sell</a></li>
+                                <li><a class="dropdown-item" href="#">Buy</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Forum</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container mt-5">
+        <h2 class="text-center">Sell Your Product</h2>
+
+        <form asp-action="Sell" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Product Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Description</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Price" class="control-label">Price</label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Category" class="control-label">Category</label>
+                <select asp-for="Category" class="form-control">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Home">Home</option>
+                    <option value="Books">Books</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProductImages" class="control-label">Upload Product Images</label>
+                <input asp-for="ProductImages" type="file" class="form-control" multiple /> <!-- Allow multiple files -->
+                <span asp-validation-for="ProductImages" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Sell Product</button>
+            </div>
+        </form>
+    </div>
+    <!-- Include Bootstrap and Popper.js -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>
+
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

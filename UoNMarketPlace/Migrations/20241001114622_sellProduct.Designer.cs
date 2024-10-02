@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UoNMarketPlace.DataContext;
 
@@ -11,9 +12,11 @@ using UoNMarketPlace.DataContext;
 namespace UoNMarketPlace.Migrations
 {
     [DbContext(typeof(UoNDB))]
-    partial class UoNDBModelSnapshot : ModelSnapshot
+    [Migration("20241001114622_sellProduct")]
+    partial class sellProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,35 +54,35 @@ namespace UoNMarketPlace.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0afd8ec9-a524-47a8-aed5-84b8e4291cc6",
+                            Id = "38492d99-7258-4acc-9b8c-eaabe5c8c64a",
                             ConcurrencyStamp = "1",
                             Name = "Student",
                             NormalizedName = "Student"
                         },
                         new
                         {
-                            Id = "f4a3e137-d34e-47fb-97d1-da9f76c84143",
+                            Id = "5841fc7c-b804-4df0-ab74-b91f7705937b",
                             ConcurrencyStamp = "2",
                             Name = "Faculty",
                             NormalizedName = "Faculty"
                         },
                         new
                         {
-                            Id = "fb062d91-73a3-4258-b4eb-21c7ea6322fa",
+                            Id = "19e7c31a-f77e-4bcc-8c17-148de232d325",
                             ConcurrencyStamp = "3",
                             Name = "Staff",
                             NormalizedName = "Staff"
                         },
                         new
                         {
-                            Id = "5c4671ac-d200-451f-9afd-b1b1deb6cbe3",
+                            Id = "7a88ff2b-aab2-43f5-a56a-51ea0e9e8edb",
                             ConcurrencyStamp = "4",
                             Name = "Alumini",
                             NormalizedName = "Alumini"
                         },
                         new
                         {
-                            Id = "3c5f6217-22e1-459a-b63e-737dcbf21e02",
+                            Id = "7ce2ad2b-7f5a-4fdb-be62-dc7bae5cf9ad",
                             ConcurrencyStamp = "5",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -277,9 +280,6 @@ namespace UoNMarketPlace.Migrations
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateUploaded")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -291,13 +291,6 @@ namespace UoNMarketPlace.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("SellerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Views")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

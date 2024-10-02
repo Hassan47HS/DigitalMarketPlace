@@ -1,0 +1,56 @@
+﻿@model List<UoNMarketPlace.Model.sellProduct>
+
+<div class="container">
+    <h2>Your Products</h2>
+    
+    <!-- Add form to post sortBy and filterBy parameters -->
+    <form method="get" action="@Url.Action("SellerDashboard", "Product")">
+        <div class="form-group">
+            <label for="sortBy">Sort by:</label>
+            <select id="sortBy" name="sortBy" class="form-control">
+                <option value="dateUploaded"
+                        selected="@(ViewBag.SortBy == "dateUploaded" ? "selected" : null)">Date Uploaded</option>
+                <option value="views"
+                        selected="@(ViewBag.SortBy == "views" ? "selected" : null)">Views</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="filterBy">Filter by:</label>
+            <input id="filterBy" name="filterBy" type="text" class="form-control" value="@ViewBag.FilterBy" placeholder="Search products..." />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </form>
+
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Views</th>
+                <th>Date Uploaded</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price</td>
+                    <td>@product.Views</td>
+                    <td>@product.DateUploaded</td>
+                    <td>
+                        <a href="@Url.Action("ProductDetails", "Product", new { id = product.Id })" class="btn btn-primary">View</a>
+                        <form method="post" asp-action="DeleteProduct" asp-route-id="@product.Id" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

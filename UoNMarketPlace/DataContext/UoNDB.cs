@@ -18,6 +18,7 @@ namespace UoNMarketPlace.DataContext
 
         }
         public DbSet<User> users { get; set; }
+        public DbSet<sellProduct> Products { get; set; }
 
         private void seedRoles(ModelBuilder builder)
         {

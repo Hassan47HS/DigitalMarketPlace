@@ -39,7 +39,8 @@ namespace UoNMarketPlace.Controllers
             if (ModelState.IsValid)
             {
                 var signedUser = await _userManager.FindByEmailAsync(model.Email);
-                var result = await _signInManager.PasswordSignInAsync(signedUser.Email, model.Password, false, lockoutOnFailure: false);
+                var isPasswordValid = await _userManager.CheckPasswordAsync(signedUser, model.Password);
+                var result = await _signInManager.PasswordSignInAsync(signedUser.UserName, model.Password, false, lockoutOnFailure: false);
 
                 if (result.Succeeded)
                 {
@@ -55,10 +56,10 @@ namespace UoNMarketPlace.Controllers
                     await _signInManager.UserManager.AddClaimAsync(user, new Claim(ClaimTypes.NameIdentifier, user.Id));
 
                     // Redirect to the appropriate action
-                    //if (roles.Contains("Admin"))
-                    //{
-                    //    return RedirectToAction("ManageCategories", "Admin");
-                    //}
+                    if (roles.Contains("Student"))
+                    {
+                        return RedirectToAction("LandingPage", "Product");
+                    }
                     //else if (roles.Contains("Customer"))
                     //{
                     //    return RedirectToAction("ViewServices", "Customer");

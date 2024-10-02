@@ -8,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<UoNDB>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("UoNcs")));
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<UoNDB>().AddDefaultTokenProviders();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminRole", policy => policy.RequireRole("Admin"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
