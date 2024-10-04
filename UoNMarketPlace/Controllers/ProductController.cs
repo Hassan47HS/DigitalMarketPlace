@@ -51,7 +51,7 @@ namespace UoNMarketPlace.Controllers
 
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("LandingPage");
+                return RedirectToAction("SellerDashboard");
             }
 
             return View(model);
@@ -72,9 +72,16 @@ namespace UoNMarketPlace.Controllers
                 return NotFound();
             }
 
-            // Increment product views
-            product.Views++;
-            _context.SaveChanges();
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            // If the current user is not the seller, increment views
+            if (sellerIdClaim != null && sellerIdClaim.Value != product.SellerId)
+            {
+                product.Views++;
+                _context.SaveChanges();
+            }
+
 
             return View(product);
         }
@@ -137,6 +144,80 @@ namespace UoNMarketPlace.Controllers
             await _context.SaveChangesAsync();
 
             // You should also delete it from the buy list or any other related tables.
+            return RedirectToAction("SellerDashboard");
+        }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            // Ensure that the product belongs to the current seller
+            if (sellerIdClaim == null || sellerIdClaim.Value != product.SellerId)
+            {
+                return Unauthorized(); // Only the seller can edit their product
+            }
+
+            var model = new EditProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Category = product.Category,
+                ExistingImages = product.ImagePath.Split(',').ToList()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditProductViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var product = await _context.Products.FindAsync(model.Id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+
+            // Ensure that the product belongs to the current seller
+            if (sellerIdClaim == null || sellerIdClaim.Value != product.SellerId)
+            {
+                return Unauthorized();
+            }
+
+            // Update product details
+            product.Name = model.Name;
+            product.Description = model.Description;
+            product.Price = model.Price;
+            product.Category = model.Category;
+
+            // Handle new image uploads
+            if (model.ProductImages != null && model.ProductImages.Any())
+            {
+                var newImagePaths = await SaveImages(model.ProductImages);
+                product.ImagePath = string.Join(",", newImagePaths);
+            }
+
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("SellerDashboard");
         }
 

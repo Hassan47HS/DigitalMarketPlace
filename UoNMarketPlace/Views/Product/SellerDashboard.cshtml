@@ -45,10 +45,12 @@
                     <td>@product.DateUploaded</td>
                     <td>
                         <a href="@Url.Action("ProductDetails", "Product", new { id = product.Id })" class="btn btn-primary">View</a>
+                        <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-warning">Edit</a>
                         <form method="post" asp-action="DeleteProduct" asp-route-id="@product.Id" class="d-inline">
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </td>
+
                 </tr>
             }
         </tbody>
