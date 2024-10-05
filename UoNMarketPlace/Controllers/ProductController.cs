@@ -14,10 +14,14 @@ namespace UoNMarketPlace.Controllers
             _context = context;
         }
 
+        #region Landing Page
         public IActionResult LandingPage()
         {
             return View();
         }
+        #endregion
+
+        #region Sell
         [HttpGet]
         public IActionResult Sell()
         {
@@ -56,13 +60,36 @@ namespace UoNMarketPlace.Controllers
 
             return View(model);
         }
-        public IActionResult Buy()
+        #endregion
+
+        #region Buy
+        public IActionResult Buy(string search = "", string category = "") //, decimal minPrice = 0, decimal maxPrice = 1000000m
         {
             // Fetch all products from the database
-            var products = _context.Products.ToList();
+            var products = _context.Products.AsQueryable();
 
-            return View(products);
+            // Apply search by product name or description
+            if (!string.IsNullOrEmpty(search))
+            {
+                products = products.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+            }
+
+            // Apply category filter
+            else if (!string.IsNullOrEmpty(category))
+            {
+                products = products.Where(p => p.Category == category);
+            }
+
+            // Apply price range filter
+            //products = products.Where(p => p.Price >= minPrice && p.Price <= maxPrice);
+
+            // Return the filtered products to the view
+            return View(products.ToList());
         }
+
+        #endregion
+
+        #region Product details
         public IActionResult ProductDetails(int id)
         {
             var product = _context.Products.FirstOrDefault(p => p.Id == id);
@@ -86,6 +113,9 @@ namespace UoNMarketPlace.Controllers
             return View(product);
         }
 
+        #endregion
+
+        #region Seller Dashboard
         public IActionResult SellerDashboard(string sortBy = "dateUploaded", string filterBy = "")
         {
             // Retrieve the seller's ID from the claims
@@ -107,7 +137,7 @@ namespace UoNMarketPlace.Controllers
             {
                 products = products.Where(p => p.Name.Contains(filterBy) ||
                                                p.Description.Contains(filterBy) ||
-                                               p.Category.Contains(filterBy)); 
+                                               p.Category.Contains(filterBy));
             }
 
             // Apply sorting based on the sortBy parameter
@@ -130,7 +160,9 @@ namespace UoNMarketPlace.Controllers
             return View(products.ToList());
         }
 
+        #endregion 
 
+        #region Delete
         [HttpPost]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -146,6 +178,9 @@ namespace UoNMarketPlace.Controllers
             // You should also delete it from the buy list or any other related tables.
             return RedirectToAction("SellerDashboard");
         }
+        #endregion
+
+        #region Edit
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -220,8 +255,9 @@ namespace UoNMarketPlace.Controllers
 
             return RedirectToAction("SellerDashboard");
         }
+        #endregion
 
-        #region
+        #region Private functions
         private async Task<List<string>> SaveImages(List<IFormFile> imageFiles)
         {
             var imagePaths = new List<string>();
