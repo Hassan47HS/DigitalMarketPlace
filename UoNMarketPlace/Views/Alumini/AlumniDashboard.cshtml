@@ -1,0 +1,29 @@
+﻿@model IEnumerable<UoNMarketPlace.Model.AlumniPost>
+
+<div class="container">
+    <h2>Your Posts</h2>
+
+    <a href="@Url.Action("CreatePost", "Alumini")" class="btn btn-primary mb-3">Create New Post</a>
+
+    @foreach (var post in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">@post.Title</h5>
+                <p class="card-text">@post.Content</p>
+                @if (!string.IsNullOrEmpty(post.ImagePath))
+                {
+                    <img src="@post.ImagePath" class="img-fluid" alt="Post Image" />
+                }
+
+                <p><strong>Date Posted:</strong> @post.DatePosted.ToString("dd MMM yyyy")</p>
+                <p><strong>@post.Comments.Count</strong> Comments, <strong>@post.Likes.Count</strong> Likes</p>
+
+                <form asp-action="DeletePost" method="post">
+                    <input type="hidden" name="postId" value="@post.Id" />
+                    <button type="submit" class="btn btn-danger">Delete Post</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>

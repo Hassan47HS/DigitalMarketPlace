@@ -60,10 +60,10 @@ namespace UoNMarketPlace.Controllers
                     {
                         return RedirectToAction("LandingPage", "Product");
                     }
-                    //else if (roles.Contains("Faculty"))
-                    //{
-                    //    return RedirectToAction("FacultyLandinPage", "Faculty");
-                    //}
+                    else if (roles.Contains("Alumini"))
+                    {
+                        return RedirectToAction("AluminiLandingPage", "Alumini");
+                    }
                     //else
                     //{
                     //    return RedirectToAction("Index", "Service");

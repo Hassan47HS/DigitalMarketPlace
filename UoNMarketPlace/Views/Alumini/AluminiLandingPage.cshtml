@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Alumini";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -22,21 +22,12 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="productDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Product
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="productDropdown">
-                                <li><a class="dropdown-item" asp-action="Sell" asp-controller="Product">Sell</a></li>
-                                <li><a class="dropdown-item" asp-action="Buy" asp-controller="Product">Buy</a></li>
-                            </ul>
+                    <ul class="navbar-nav flex-grow-1
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-action="Forum" asp-controller="Alumini">Forum</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-action="Forum" asp-controller="Alumini">Forum</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-action="SellerDashboard" asp-controller="Product">Dashboard</a>
+                            <a class="nav-link text-dark" asp-action="AlumniDashboard" asp-controller="Alumini">Dashboard</a>
                         </li>
                         @if (SignInManager.IsSignedIn(User))
                         {

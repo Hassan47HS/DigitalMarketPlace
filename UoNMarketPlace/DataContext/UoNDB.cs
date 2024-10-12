@@ -19,6 +19,10 @@ namespace UoNMarketPlace.DataContext
         }
         public DbSet<User> users { get; set; }
         public DbSet<sellProduct> Products { get; set; }
+        public DbSet<AlumniPost> AlumniPosts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Like> Likes { get; set; }
+        public DbSet<Reply> Replies { get; set; }
 
         private void seedRoles(ModelBuilder builder)
         {

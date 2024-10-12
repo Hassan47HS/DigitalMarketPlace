@@ -1,0 +1,60 @@
+﻿@model IEnumerable<UoNMarketPlace.Model.AlumniPost>
+
+<div class="container">
+    <h2>Forum - Internship Opportunities</h2>
+
+    @foreach (var post in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">@post.Title</h5>
+                <p class="card-text">@post.Content</p>
+                @if (!string.IsNullOrEmpty(post.ImagePath))
+                {
+                    <img src="@post.ImagePath" class="img-fluid" alt="Post Image" />
+                }
+
+                <p><strong>Date Posted:</strong> @post.DatePosted.ToString("dd MMM yyyy")</p>
+                <p><strong>@post.Comments.Count</strong> Comments, <strong>@post.Likes.Count</strong> Likes</p>
+
+                <!-- Like Button -->
+                <form asp-action="LikePost" method="post">
+                    <input type="hidden" name="postId" value="@post.Id" />
+                    <button type="submit" class="btn btn-primary">Like</button>
+                </form>
+
+                <!-- Display Comments -->
+                <div class="mt-3">
+                    @foreach (var comment in post.Comments)
+                    {
+                        <div class="border p-2 mb-2">
+                            <p><strong>@comment.Text</strong> by @comment.UserId on @comment.DateCommented.ToString("dd MMM yyyy")</p>
+
+                            <!-- Display Replies -->
+                            <div class="ml-4">
+                                @foreach (var reply in comment.Replies)
+                                {
+                                    <p><strong>@reply.Text</strong> by @reply.UserId on @reply.DateReplied.ToString("dd MMM yyyy")</p>
+                                }
+                            </div>
+
+                            <!-- Add Reply Form -->
+                            <form asp-action="AddReply" method="post">
+                                <input type="hidden" name="commentId" value="@comment.Id" />
+                                <textarea name="replyText" class="form-control mb-2" placeholder="Reply to this comment"></textarea>
+                                <button type="submit" class="btn btn-secondary btn-sm">Reply</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+
+                <!-- Add Comment Form -->
+                <form asp-action="AddComment" method="post" class="mt-3">
+                    <input type="hidden" name="postId" value="@post.Id" />
+                    <textarea name="commentText" class="form-control mb-2" placeholder="Add a comment"></textarea>
+                    <button type="submit" class="btn btn-primary">Comment</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
