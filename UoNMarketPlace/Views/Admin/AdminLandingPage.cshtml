@@ -1,0 +1,46 @@
+﻿@model IEnumerable<UoNMarketPlace.Model.sellProduct>
+
+<div class="container">
+    <h2>Flagged Products Pending Review</h2>
+
+    @if (!Model.Any())
+    {
+        <p>No flagged products pending review.</p>
+    }
+    else
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Flag Reason</th>
+                    <th>Seller</th>
+                    <th>Date Uploaded</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr>
+                        <td>@product.Name</td>
+                        <td>@product.FlagReason</td>
+                        <td>@product.SellerId</td>
+                        <td>@product.DateUploaded.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <a href="@Url.Action("ProductDetails", "Product", new { id = product.Id })" class="btn btn-info btn-sm">View</a>
+                            <form asp-action="ApproveProduct" method="post" class="d-inline">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form asp-action="RejectProduct" method="post" class="d-inline">
+                                <input type="hidden" name="productId" value="@product.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

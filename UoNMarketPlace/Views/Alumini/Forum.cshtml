@@ -28,13 +28,13 @@
                     @foreach (var comment in post.Comments)
                     {
                         <div class="border p-2 mb-2">
-                            <p><strong>@comment.Text</strong> by @comment.UserId on @comment.DateCommented.ToString("dd MMM yyyy")</p>
+                            <p><strong>@comment.Text</strong> by @comment.User.UserName on @comment.DateCommented.ToString("dd MMM yyyy")</p>
 
                             <!-- Display Replies -->
                             <div class="ml-4">
                                 @foreach (var reply in comment.Replies)
                                 {
-                                    <p><strong>@reply.Text</strong> by @reply.UserId on @reply.DateReplied.ToString("dd MMM yyyy")</p>
+                                    <p><strong>@reply.Text</strong> by @reply.User.UserName on @reply.DateReplied.ToString("dd MMM yyyy")</p>
                                 }
                             </div>
 

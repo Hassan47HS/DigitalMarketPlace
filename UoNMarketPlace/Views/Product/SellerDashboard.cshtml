@@ -23,6 +23,7 @@
         <button type="submit" class="btn btn-primary">Apply Filters</button>
     </form>
 
+    <!-- Product List -->
     <table class="table mt-3">
         <thead>
             <tr>
@@ -30,7 +31,7 @@
                 <th>Description</th>
                 <th>Price</th>
                 <th>Views</th>
-                <th>Date Uploaded</th>
+                <th>Rating</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -42,7 +43,23 @@
                     <td>@product.Description</td>
                     <td>@product.Price</td>
                     <td>@product.Views</td>
-                    <td>@product.DateUploaded</td>
+                    <td>
+                        <!-- Display rating as stars -->
+                        <span class="rating">
+                            @for (var i = 1; i <= 5; i++)
+                            {
+                                if (i <= product.Rating)
+                                {
+                                    <i class="fas fa-star text-warning"></i> <!-- Filled star for rating -->
+                                }
+                                else
+                                {
+                                    <i class="far fa-star text-warning"></i> <!-- Empty star -->
+                                }
+                            }
+                            <span>(@product.Rating)</span>
+                        </span>
+                    </td>
                     <td>
                         <a href="@Url.Action("ProductDetails", "Product", new { id = product.Id })" class="btn btn-primary">View</a>
                         <a href="@Url.Action("Edit", "Product", new { id = product.Id })" class="btn btn-warning">Edit</a>
@@ -50,9 +67,50 @@
                             <button type="submit" class="btn btn-danger">Delete</button>
                         </form>
                     </td>
+                </tr>
 
+                <!-- Product Reviews Section -->
+                <tr>
+                    <td colspan="6">
+                        <div class="product-reviews">
+                            <h5>Reviews for @product.Name</h5>
+                            @if (product.Reviews != null && product.Reviews.Any())
+                            {
+                                <ul class="list-group">
+                                    @foreach (var review in product.Reviews)
+                                    {
+                                        <li class="list-group-item">
+                                            <strong>@review.UserName</strong> (@review.DateReviewed.ToShortDateString()):
+                                            <p>@review.ReviewText</p>
+                                            <span class="rating">
+                                                @for (var i = 1; i <= 5; i++)
+                                                {
+                                                    if (i <= review.Rating)
+                                                    {
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="far fa-star text-warning"></i>
+                                                    }
+                                                }
+                                                <span>(@review.Rating)</span>
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p>No reviews yet for this product.</p>
+                            }
+                        </div>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+

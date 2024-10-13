@@ -29,7 +29,15 @@ namespace UoNMarketPlace.Controllers
         // Display alumni posts for students in the forum
         public IActionResult Forum()
         {
-            var posts = _context.AlumniPosts.Include(p => p.Comments).ThenInclude(c => c.Replies).Include(p => p.Likes).ToList();
+            var posts = _context.AlumniPosts
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.Replies)
+                        .ThenInclude(r => r.User) // Include the user for replies
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.User) // Include the user for comments
+                .Include(p => p.Likes)
+                .ToList();
+
             return View(posts);
         }
         // For alumni to add a new post

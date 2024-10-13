@@ -3,6 +3,7 @@ using UoNMarketPlace.DataContext;
 using UoNMarketPlace.ViewModel;
 using UoNMarketPlace.Model;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace UoNMarketPlace.Controllers
 {
@@ -50,7 +51,8 @@ namespace UoNMarketPlace.Controllers
                     Category = model.Category,
                     ImagePath = string.Join(",", imagePaths),// Join the image paths as a comma-separated string
                     SellerId = sellerId,
-                    DateUploaded = DateTime.Now
+                    DateUploaded = DateTime.Now,
+                    IsApproved = true // New products are approved by default
                 };
 
                 _context.Products.Add(product);
@@ -66,7 +68,7 @@ namespace UoNMarketPlace.Controllers
         public IActionResult Buy(string search = "", string category = "") //, decimal minPrice = 0, decimal maxPrice = 1000000m
         {
             // Fetch all products from the database
-            var products = _context.Products.AsQueryable();
+            var products = _context.Products.Where(p => p.IsApproved && !p.IsFlagged).AsQueryable();
 
             // Apply search by product name or description
             if (!string.IsNullOrEmpty(search))
@@ -92,23 +94,48 @@ namespace UoNMarketPlace.Controllers
         #region Product details
         public IActionResult ProductDetails(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+            // Fetch the product by ID along with reviews
+            // Fetch the product by ID, even if flagged, but exclude it from reviews display
+            var product = _context.Products
+                .FirstOrDefault(p => p.Id == id);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            // Check if the product is flagged and show an appropriate message
+            if (product.IsFlagged)
+            {
+                ViewBag.Message = "This product is pending review for being flagged as inappropriate.";
+            }
+
+            // For unapproved or flagged products, don't display reviews
+            if (!product.IsApproved || product.IsFlagged)
+            {
+                return View("FlaggedProductDetails", product); // Create a separate view for flagged products
+            }
+
+            // Load reviews for approved and non-flagged products only
+            product = _context.Products
+                .Include(p => p.Reviews)
+                .FirstOrDefault(p => p.Id == id && p.IsApproved && !p.IsFlagged);
+
 
             // If the current user is not the seller, increment views
-            if (sellerIdClaim != null && sellerIdClaim.Value != product.SellerId)
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            if (sellerIdClaim == null || sellerIdClaim.Value != product.SellerId)
             {
                 product.Views++;
                 _context.SaveChanges();
             }
 
+            // Calculate average rating if there are reviews
+            if (product.Reviews.Any())
+            {
+                product.Rating = product.Reviews.Average(r => r.Rating);
+            }
 
             return View(product);
         }
@@ -254,6 +281,78 @@ namespace UoNMarketPlace.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("SellerDashboard");
+        }
+        #endregion
+
+        #region Review
+        [HttpPost]
+        public async Task<IActionResult> SubmitReview(int productId, int rating, string reviewText)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userName = User.Identity.Name;
+
+            var review = new ProductReview
+            {
+                ProductId = productId,
+                UserId = userId,
+                UserName = userName,
+                Rating = rating,
+                ReviewText = reviewText,
+                DateReviewed = DateTime.Now
+            };
+
+            var product = await _context.Products.FindAsync(productId);
+            if (product != null)
+            {
+                product.Reviews.Add(review);
+                product.Rating = product.Reviews.Average(r => r.Rating); // Update average rating
+
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("ProductDetails", new { id = productId });
+        }
+
+        #endregion
+
+        #region Flagged Product
+        [HttpGet]
+        public IActionResult FlagProduct(int id)
+        {
+            var product = _context.Products.Find(id);
+            if (product == null || !product.IsApproved)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+        [HttpPost]
+        public async Task<IActionResult> FlagProduct(int productId, string reason)
+        {
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Flag the product as inappropriate
+            product.IsFlagged = true;
+            product.FlagReason = reason;
+            product.IsApproved = false; // Pending admin review
+
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+
+            // Optionally, redirect to a confirmation page or the product details page
+            return RedirectToAction("FlagConfirmation");
+        }
+        // Confirmation view after flagging a product
+        public IActionResult FlagConfirmation()
+        {
+            return View();
         }
         #endregion
 

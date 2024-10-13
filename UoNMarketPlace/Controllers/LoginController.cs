@@ -39,6 +39,11 @@ namespace UoNMarketPlace.Controllers
             if (ModelState.IsValid)
             {
                 var signedUser = await _userManager.FindByEmailAsync(model.Email);
+                if(signedUser ==  null)
+                {
+                    ModelState.AddModelError(string.Empty, "The Email you entered is not existed need to sign up");
+                    return View(model);
+                }
                 var isPasswordValid = await _userManager.CheckPasswordAsync(signedUser, model.Password);
                 var result = await _signInManager.PasswordSignInAsync(signedUser.UserName, model.Password, false, lockoutOnFailure: false);
 
@@ -63,6 +68,10 @@ namespace UoNMarketPlace.Controllers
                     else if (roles.Contains("Alumini"))
                     {
                         return RedirectToAction("AluminiLandingPage", "Alumini");
+                    }
+                    else if (roles.Contains("Admin"))
+                    {
+                        return RedirectToAction("AdminLandingPage", "Admin");
                     }
                     //else
                     //{

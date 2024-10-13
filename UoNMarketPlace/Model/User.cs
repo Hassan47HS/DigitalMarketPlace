@@ -12,8 +12,6 @@ namespace UoNMarketPlace.Model
     public enum Role
     {
         Student,
-        Faculty,
-        staff,
         alumini,
         Admin
     }

@@ -23,14 +23,13 @@ namespace UoNMarketPlace.DataContext
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Reply> Replies { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
         private void seedRoles(ModelBuilder builder)
         {
             builder.Entity<IdentityRole>().HasData
                 (
                 new IdentityRole() { Name = "Student", ConcurrencyStamp = "1", NormalizedName = "Student" },
-                new IdentityRole() { Name = "Faculty", ConcurrencyStamp = "2", NormalizedName = "Faculty" },
-                new IdentityRole() { Name = "Staff", ConcurrencyStamp = "3", NormalizedName = "Staff" },
                 new IdentityRole() { Name = "Alumini", ConcurrencyStamp = "4", NormalizedName = "Alumini" },
                 new IdentityRole() { Name = "Admin", ConcurrencyStamp = "5", NormalizedName = "Admin" }
                 );
