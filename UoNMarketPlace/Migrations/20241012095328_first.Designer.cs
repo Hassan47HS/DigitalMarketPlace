@@ -12,8 +12,8 @@ using UoNMarketPlace.DataContext;
 namespace UoNMarketPlace.Migrations
 {
     [DbContext(typeof(UoNDB))]
-    [Migration("20241005141322_Alumini")]
-    partial class Alumini
+    [Migration("20241012095328_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,35 +54,21 @@ namespace UoNMarketPlace.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a5a132db-9a3a-4331-8d98-5098c0a6b02b",
+                            Id = "efffc626-de1d-41f7-8d3b-dd60ad5e0c36",
                             ConcurrencyStamp = "1",
                             Name = "Student",
                             NormalizedName = "Student"
                         },
                         new
                         {
-                            Id = "046faf16-9c66-4fcc-a522-d7d19067d901",
-                            ConcurrencyStamp = "2",
-                            Name = "Faculty",
-                            NormalizedName = "Faculty"
-                        },
-                        new
-                        {
-                            Id = "1fc8803e-fd93-4e62-b72b-e56492887082",
-                            ConcurrencyStamp = "3",
-                            Name = "Staff",
-                            NormalizedName = "Staff"
-                        },
-                        new
-                        {
-                            Id = "d4c261e7-7ba7-40cd-a819-59e939666c5f",
+                            Id = "b13882af-c132-4645-bf13-d493d6d8dfbb",
                             ConcurrencyStamp = "4",
                             Name = "Alumini",
                             NormalizedName = "Alumini"
                         },
                         new
                         {
-                            Id = "8badfe42-089a-4cfb-b0e3-aae95d452bc1",
+                            Id = "6f8aa867-f133-46cb-a874-d4e75f72dc07",
                             ConcurrencyStamp = "5",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -278,22 +264,18 @@ namespace UoNMarketPlace.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AlumniId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ImagePath")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
