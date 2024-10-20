@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace UoNMarketPlace.Migrations
 {
     /// <inheritdoc />
-    public partial class Alumini : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,11 +19,11 @@ namespace UoNMarketPlace.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImagePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DatePosted = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AlumniId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AlumniId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -267,11 +267,9 @@ namespace UoNMarketPlace.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "046faf16-9c66-4fcc-a522-d7d19067d901", "2", "Faculty", "Faculty" },
-                    { "1fc8803e-fd93-4e62-b72b-e56492887082", "3", "Staff", "Staff" },
-                    { "8badfe42-089a-4cfb-b0e3-aae95d452bc1", "5", "Admin", "Admin" },
-                    { "a5a132db-9a3a-4331-8d98-5098c0a6b02b", "1", "Student", "Student" },
-                    { "d4c261e7-7ba7-40cd-a819-59e939666c5f", "4", "Alumini", "Alumini" }
+                    { "6f8aa867-f133-46cb-a874-d4e75f72dc07", "5", "Admin", "Admin" },
+                    { "b13882af-c132-4645-bf13-d493d6d8dfbb", "4", "Alumini", "Alumini" },
+                    { "efffc626-de1d-41f7-8d3b-dd60ad5e0c36", "1", "Student", "Student" }
                 });
 
             migrationBuilder.CreateIndex(
