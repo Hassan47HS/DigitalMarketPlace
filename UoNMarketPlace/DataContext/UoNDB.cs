@@ -24,6 +24,9 @@ namespace UoNMarketPlace.DataContext
         public DbSet<Like> Likes { get; set; }
         public DbSet<Reply> Replies { get; set; }
         public DbSet<ProductReview> ProductReviews { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         private void seedRoles(ModelBuilder builder)
         {

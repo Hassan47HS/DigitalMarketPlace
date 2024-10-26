@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UoNMarketPlace.DataContext;
 
@@ -11,9 +12,11 @@ using UoNMarketPlace.DataContext;
 namespace UoNMarketPlace.Migrations
 {
     [DbContext(typeof(UoNDB))]
-    partial class UoNDBModelSnapshot : ModelSnapshot
+    [Migration("20241023100048_Buyer")]
+    partial class Buyer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,21 +54,21 @@ namespace UoNMarketPlace.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3781959f-0ead-4260-b50c-895a36f5752c",
+                            Id = "69761adc-a5ad-4db4-add7-5ebeacf193f1",
                             ConcurrencyStamp = "1",
                             Name = "Student",
                             NormalizedName = "Student"
                         },
                         new
                         {
-                            Id = "7c52155f-3ec5-49b4-9549-e71a3766d8b5",
+                            Id = "ac8ea88a-bb7f-4289-9b30-5fa8cedfc99e",
                             ConcurrencyStamp = "4",
                             Name = "Alumini",
                             NormalizedName = "Alumini"
                         },
                         new
                         {
-                            Id = "5b19139a-a6b9-4e0f-b9e0-364ab31b50aa",
+                            Id = "203d98e3-fc10-4e3b-bb5e-047f484de85b",
                             ConcurrencyStamp = "5",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -369,7 +372,7 @@ namespace UoNMarketPlace.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ProductId")
+                    b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<string>("ReceiverId")
@@ -387,9 +390,12 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("sellProductId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("sellProductId");
 
                     b.ToTable("Messages");
                 });
@@ -410,9 +416,6 @@ namespace UoNMarketPlace.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SellerId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -445,10 +448,6 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SellerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -457,9 +456,12 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("sellProductId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("sellProductId");
 
                     b.ToTable("ProductReviews");
                 });
@@ -504,6 +506,7 @@ namespace UoNMarketPlace.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BuyerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
@@ -647,22 +650,16 @@ namespace UoNMarketPlace.Migrations
 
             modelBuilder.Entity("UoNMarketPlace.Model.Message", b =>
                 {
-                    b.HasOne("UoNMarketPlace.Model.sellProduct", "Product")
+                    b.HasOne("UoNMarketPlace.Model.sellProduct", null)
                         .WithMany("Messages")
-                        .HasForeignKey("ProductId");
-
-                    b.Navigation("Product");
+                        .HasForeignKey("sellProductId");
                 });
 
             modelBuilder.Entity("UoNMarketPlace.Model.ProductReview", b =>
                 {
-                    b.HasOne("UoNMarketPlace.Model.sellProduct", "Product")
+                    b.HasOne("UoNMarketPlace.Model.sellProduct", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
+                        .HasForeignKey("sellProductId");
                 });
 
             modelBuilder.Entity("UoNMarketPlace.Model.Reply", b =>

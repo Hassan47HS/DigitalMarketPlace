@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UoNMarketPlace.DataContext;
 
@@ -11,9 +12,11 @@ using UoNMarketPlace.DataContext;
 namespace UoNMarketPlace.Migrations
 {
     [DbContext(typeof(UoNDB))]
-    partial class UoNDBModelSnapshot : ModelSnapshot
+    [Migration("20241026055108_Check")]
+    partial class Check
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,21 +54,21 @@ namespace UoNMarketPlace.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3781959f-0ead-4260-b50c-895a36f5752c",
+                            Id = "0428b7dd-11f7-4d45-91ea-126dcba86daf",
                             ConcurrencyStamp = "1",
                             Name = "Student",
                             NormalizedName = "Student"
                         },
                         new
                         {
-                            Id = "7c52155f-3ec5-49b4-9549-e71a3766d8b5",
+                            Id = "da95cec0-abb4-477b-9186-d0f89ed3b7de",
                             ConcurrencyStamp = "4",
                             Name = "Alumini",
                             NormalizedName = "Alumini"
                         },
                         new
                         {
-                            Id = "5b19139a-a6b9-4e0f-b9e0-364ab31b50aa",
+                            Id = "b3a5c7d5-1432-493b-a858-f96f014d3eae",
                             ConcurrencyStamp = "5",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -412,8 +415,8 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SellerId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -445,10 +448,6 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SellerId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -457,9 +456,12 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("sellProductId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("sellProductId");
 
                     b.ToTable("ProductReviews");
                 });
@@ -656,13 +658,9 @@ namespace UoNMarketPlace.Migrations
 
             modelBuilder.Entity("UoNMarketPlace.Model.ProductReview", b =>
                 {
-                    b.HasOne("UoNMarketPlace.Model.sellProduct", "Product")
+                    b.HasOne("UoNMarketPlace.Model.sellProduct", null)
                         .WithMany("Reviews")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
+                        .HasForeignKey("sellProductId");
                 });
 
             modelBuilder.Entity("UoNMarketPlace.Model.Reply", b =>

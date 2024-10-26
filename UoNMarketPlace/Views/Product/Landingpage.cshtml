@@ -33,6 +33,17 @@
                             </ul>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link position-relative" asp-action="Notifications" asp-controller="Product">
+                                <i class="fas fa-bell"></i> Notifications
+                                @if (ViewBag.UnreadCount > 0)
+                                {
+                                    <span class="badge badge-danger position-absolute top-0 start-100 translate-middle">
+                                        @ViewBag.UnreadCount
+                                    </span>
+                                }
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-action="Forum" asp-controller="Alumini">Forum</a>
                         </li>
                         <li class="nav-item">
