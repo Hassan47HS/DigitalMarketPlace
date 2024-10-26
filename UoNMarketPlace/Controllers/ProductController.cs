@@ -65,10 +65,12 @@ namespace UoNMarketPlace.Controllers
         #endregion
 
         #region Buy
-        public IActionResult Buy(string search = "", string category = "") //, decimal minPrice = 0, decimal maxPrice = 1000000m
+        public IActionResult Buy(string search = "", string category = "") 
         {
+            var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+
             // Fetch all products from the database
-            var products = _context.Products.Where(p => p.IsApproved && !p.IsFlagged).AsQueryable();
+            var products = _context.Products.Where(p => p.IsApproved && !p.IsSold && !p.IsFlagged  && p.SellerId != userId).AsQueryable();
 
             // Apply search by product name or description
             if (!string.IsNullOrEmpty(search))
@@ -88,6 +90,114 @@ namespace UoNMarketPlace.Controllers
             // Return the filtered products to the view
             return View(products.ToList());
         }
+        public IActionResult BuyNow(int Id)
+        {
+            var product = _context.Products
+                .Include(p => p.Messages) // Include messages
+                .FirstOrDefault(p => p.Id == Id);
+
+            if (product == null || product.IsSold) return NotFound();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Retrieve all messages related to the product involving the current user
+            var messages = product.Messages
+                .Where(m => m.SenderId == userId || m.ReceiverId == userId || m.ReceiverId == product.SellerId)
+                .OrderBy(m => m.SentAt)
+                .ToList();
+
+            var chatViewModel = new ChatViewModel
+            {
+                Messages = messages,
+                ProductId = product.Id,
+                SellerId = product.SellerId
+            };
+
+            return View(chatViewModel);
+        }
+
+        #endregion
+
+        #region Send Message
+        [HttpPost]
+        public IActionResult SendMessage(int productId, string receiverId, string message)
+        {
+            var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var newMessage = new Message
+            {
+                ProductId = productId,
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                Text = message,
+                SentAt = DateTime.Now
+            };
+
+            _context.Messages.Add(newMessage);
+            _context.SaveChanges();
+
+            return RedirectToAction("BuyNow", new { Id = productId });
+        }
+
+
+        #endregion
+
+        #region Mark as sold 
+        #region Mark as Sold
+        [HttpPost]
+        public async Task<IActionResult> MarkAsSold(int productId)
+        {
+            var sellerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var product = await _context.Products
+                .Include(p => p.Messages) // Load messages to find the buyer
+                .FirstOrDefaultAsync(p => p.Id == productId && p.SellerId == sellerId);
+
+            if (product == null) return NotFound();
+            if (product.IsSold) return BadRequest("This product is already marked as sold.");
+
+            // Find the most recent valid buyer (message sender who is not the seller)
+            var latestBuyer = product.Messages
+                .Where(m => m.SenderId != sellerId) // Exclude seller's messages
+                .OrderByDescending(m => m.SentAt)
+                .FirstOrDefault()?.SenderId;
+
+            if (string.IsNullOrEmpty(latestBuyer))
+            {
+                TempData["Notification"] = "No valid buyer found to notify.";
+                return RedirectToAction("SellerDashboard");
+            }
+
+            product.IsSold = true;
+            product.BuyerId = latestBuyer; // Assign the valid buyer to the product
+
+            // Create notifications for both buyer and seller
+            var buyerNotification = new Notification
+            {
+                UserId = latestBuyer,
+                Message = $"Congratulations! You have successfully purchased the product '{product.Name}'. Please leave a review.",
+                CreatedAt = DateTime.Now,
+                IsRead = false,
+                SellerId = product.SellerId // Include seller ID
+            };
+            _context.Notifications.Add(buyerNotification);
+
+            var sellerNotification = new Notification
+            {
+                UserId = product.SellerId,
+                Message = $"Your product '{product.Name}' has been sold to a buyer.",
+                CreatedAt = DateTime.Now,
+                IsRead = false
+            };
+            _context.Notifications.Add(sellerNotification);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Notification"] = "Product marked as sold successfully!";
+            return RedirectToAction("SellerDashboard");
+        }
+        #endregion
+
 
         #endregion
 
@@ -140,51 +250,119 @@ namespace UoNMarketPlace.Controllers
             return View(product);
         }
 
+        public IActionResult ProductDetailsSeller(int id)
+        {
+            // Fetch the product by ID along with reviews
+            // Fetch the product by ID, even if flagged, but exclude it from reviews display
+            var product = _context.Products
+                .FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Check if the product is flagged and show an appropriate message
+            if (product.IsFlagged)
+            {
+                ViewBag.Message = "This product is pending review for being flagged as inappropriate.";
+            }
+
+            // For unapproved or flagged products, don't display reviews
+            if (!product.IsApproved || product.IsFlagged)
+            {
+                return View("FlaggedProductDetails", product); // Create a separate view for flagged products
+            }
+
+            // Load reviews for approved and non-flagged products only
+            product = _context.Products
+                .Include(p => p.Reviews)
+                .FirstOrDefault(p => p.Id == id && p.IsApproved && !p.IsFlagged);
+
+
+            // If the current user is not the seller, increment views
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            if (sellerIdClaim == null || sellerIdClaim.Value != product.SellerId)
+            {
+                product.Views++;
+                _context.SaveChanges();
+            }
+
+            // Calculate average rating if there are reviews
+            if (product.Reviews.Any())
+            {
+                product.Rating = product.Reviews.Average(r => r.Rating);
+            }
+
+            return View(product);
+        }
+
         #endregion
 
         #region Seller Dashboard
         public IActionResult SellerDashboard(string sortBy = "dateUploaded", string filterBy = "")
         {
-            // Retrieve the seller's ID from the claims
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var sellerIdClaim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            var sellerId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (sellerId == null) return Unauthorized(); // Ensure the user is authenticated
 
-            if (sellerIdClaim == null)
-            {
-                return Unauthorized(); // If the user is not authenticated
-            }
+            // Retrieve all products for the current seller, including related messages
+            var products = _context.Products
+                .Where(p => p.SellerId == sellerId)
+                .Include(p => p.Messages) // Include related messages
+                .ToList();
 
-            var sellerId = sellerIdClaim.Value; // Extract the seller ID from the claim
+            // Retrieve all reviews for the seller
+            var sellerReviews = _context.ProductReviews
+                .Where(r => r.SellerId == sellerId)
+                .Include(r => r.Product) // Include product details
+                .ToList();
 
-            // Get all products for the current seller
-            var products = _context.Products.Where(p => p.SellerId == sellerId);
+            // Calculate the average rating for the seller
+            double averageRating = sellerReviews.Any()
+                ? sellerReviews.Average(r => r.Rating)
+                : 0;
+
+            ViewBag.AverageRating = averageRating; // Pass average rating to the view
+            ViewBag.TotalReviews = sellerReviews.Count; // Total number of reviews
+
+            var buyerIds = products.Select(p => p.BuyerId).Where(id => id != null).Distinct();
+
+            // Fetch usernames for unique sender IDs from the messages
+            var senderIds = products.SelectMany(p => p.Messages.Select(m => m.SenderId)).Distinct();
+            var senders = _context.Users
+                .Where(u => senderIds.Contains(u.Id))
+                .ToDictionary(u => u.Id, u => u.UserName); // Map user IDs to usernames
+
+            var buyers = _context.Users
+               .Where(u => buyerIds.Contains(u.Id))
+               .ToDictionary(u => u.Id, u => u.UserName); // Map buyers
+
+            ViewBag.Buyers = buyers; // Store buyer usernames for easy access in the view
+            ViewBag.Senders = senders; // Store sender usernames for easy access
 
             // Apply filtering if provided
             if (!string.IsNullOrEmpty(filterBy))
             {
-                products = products.Where(p => p.Name.Contains(filterBy) ||
-                                               p.Description.Contains(filterBy) ||
-                                               p.Category.Contains(filterBy));
+                products = products.Where(p =>
+                    p.Name.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
+                    p.Description.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
+                    p.Category.Contains(filterBy, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             // Apply sorting based on the sortBy parameter
-            switch (sortBy)
+            products = sortBy switch
             {
-                case "views":
-                    products = products.OrderByDescending(p => p.Views);
-                    break;
-                case "dateUploaded":
-                default:
-                    products = products.OrderByDescending(p => p.DateUploaded);
-                    break;
-            }
+                "views" => products.OrderByDescending(p => p.Views).ToList(),
+                _ => products.OrderByDescending(p => p.DateUploaded).ToList()
+            };
 
-            // Pass sortBy and filterBy values to the view for UI state preservation
             ViewBag.SortBy = sortBy;
             ViewBag.FilterBy = filterBy;
 
-            // Return the products to the view
-            return View(products.ToList());
+            ViewBag.Reviews = sellerReviews; // Pass reviews to the view
+
+            return View(products);
         }
 
         #endregion 
@@ -286,35 +464,40 @@ namespace UoNMarketPlace.Controllers
 
         #region Review
         [HttpPost]
-        public async Task<IActionResult> SubmitReview(int productId, int rating, string reviewText)
+        public async Task<IActionResult> SubmitReview(string sellerId, int rating, string reviewText)
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var userName = User.Identity.Name;
+            // Fetch the buyer's ID from the logged-in user (no need to pass it)
+            var buyerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var buyerName = User.Identity.Name;
 
+            var product = await _context.Products
+            .Where(p => p.SellerId == sellerId && p.BuyerId == buyerId && p.IsSold)
+            .OrderByDescending(p => p.DateUploaded) // Use the latest sold product
+            .FirstOrDefaultAsync();
+            // Ensure the seller exists
+            var sellerExists = await _context.Users.AnyAsync(u => u.Id == sellerId);
+            if (!sellerExists) return NotFound("Seller not found.");
+
+            // Create the review for the seller (and optionally the product)
             var review = new ProductReview
             {
-                ProductId = productId,
-                UserId = userId,
-                UserName = userName,
+                SellerId = sellerId,    // The seller being reviewed
+                UserId = buyerId,       // The buyer submitting the review
+                UserName = buyerName,   // Buyer’s name
                 Rating = rating,
                 ReviewText = reviewText,
-                DateReviewed = DateTime.Now
+                DateReviewed = DateTime.Now,
+                ProductId = product.Id
             };
 
-            var product = await _context.Products.FindAsync(productId);
-            if (product != null)
-            {
-                product.Reviews.Add(review);
-                product.Rating = product.Reviews.Average(r => r.Rating); // Update average rating
+            _context.ProductReviews.Add(review);
+            await _context.SaveChangesAsync();
 
-                _context.Products.Update(product);
-                await _context.SaveChangesAsync();
-            }
+            TempData["Notification"] = "Review submitted successfully!";
 
-            return RedirectToAction("ProductDetails", new { id = productId });
+            // Redirect to the landing page
+            return RedirectToAction("LandingPage");
         }
-
         #endregion
 
         #region Flagged Product
@@ -353,6 +536,30 @@ namespace UoNMarketPlace.Controllers
         public IActionResult FlagConfirmation()
         {
             return View();
+        }
+        #endregion
+
+        #region Notification 
+        public async Task<IActionResult> Notifications()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Fetch notifications for the current user (buyer or seller)
+            var notifications = await _context.Notifications
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+
+            // Mark all unread notifications as read
+            notifications.ForEach(n => n.IsRead = true);
+            await _context.SaveChangesAsync();
+
+            // Determine if the user is the buyer for any sold product
+            var isBuyer = _context.Products.Any(p => p.BuyerId == userId);
+
+            ViewBag.IsBuyer = isBuyer; // Store flag to differentiate between views
+
+            return View(notifications);
         }
         #endregion
 
