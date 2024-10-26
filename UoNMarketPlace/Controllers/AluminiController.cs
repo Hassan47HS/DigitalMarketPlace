@@ -47,7 +47,7 @@ namespace UoNMarketPlace.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> CreatePost(AlumniPost model, IFormFile image)
+        public async Task<IActionResult> CreatePost(AlumniPost model, IFormFile? image)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +66,10 @@ namespace UoNMarketPlace.Controllers
                     }
 
                     model.ImagePath = "/images/" + fileName;
+                }
+                else
+                {
+                    model.ImagePath = null; // No image provided, handle it gracefully
                 }
 
                 _context.AlumniPosts.Add(model);
