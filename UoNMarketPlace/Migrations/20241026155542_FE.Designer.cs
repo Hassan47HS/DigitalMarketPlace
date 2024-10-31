@@ -12,8 +12,8 @@ using UoNMarketPlace.DataContext;
 namespace UoNMarketPlace.Migrations
 {
     [DbContext(typeof(UoNDB))]
-    [Migration("20241023105800_Buying")]
-    partial class Buying
+    [Migration("20241026155542_FE")]
+    partial class FE
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,21 +54,21 @@ namespace UoNMarketPlace.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "7a45b511-ff5c-44f5-b6ab-cebefa4fc9f3",
+                            Id = "38e557de-f4cc-4877-b78d-72925a64f2ac",
                             ConcurrencyStamp = "1",
                             Name = "Student",
                             NormalizedName = "Student"
                         },
                         new
                         {
-                            Id = "2683d385-6c52-4760-b24e-060369688fc0",
+                            Id = "de4c10e0-be8a-40bd-8679-9432184c1f50",
                             ConcurrencyStamp = "4",
                             Name = "Alumini",
                             NormalizedName = "Alumini"
                         },
                         new
                         {
-                            Id = "163be5b6-6120-4e70-901f-1012bc94fe6b",
+                            Id = "5edd025d-f6b6-4f04-b2a9-b0692f542203",
                             ConcurrencyStamp = "5",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -415,6 +415,9 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SellerId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -445,6 +448,10 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SellerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -453,12 +460,9 @@ namespace UoNMarketPlace.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("sellProductId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("sellProductId");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductReviews");
                 });
@@ -503,7 +507,6 @@ namespace UoNMarketPlace.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BuyerId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
@@ -656,9 +659,13 @@ namespace UoNMarketPlace.Migrations
 
             modelBuilder.Entity("UoNMarketPlace.Model.ProductReview", b =>
                 {
-                    b.HasOne("UoNMarketPlace.Model.sellProduct", null)
+                    b.HasOne("UoNMarketPlace.Model.sellProduct", "Product")
                         .WithMany("Reviews")
-                        .HasForeignKey("sellProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("UoNMarketPlace.Model.Reply", b =>

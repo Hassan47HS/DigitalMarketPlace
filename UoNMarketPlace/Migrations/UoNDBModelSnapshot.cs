@@ -51,21 +51,21 @@ namespace UoNMarketPlace.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "3781959f-0ead-4260-b50c-895a36f5752c",
+                            Id = "38e557de-f4cc-4877-b78d-72925a64f2ac",
                             ConcurrencyStamp = "1",
                             Name = "Student",
                             NormalizedName = "Student"
                         },
                         new
                         {
-                            Id = "7c52155f-3ec5-49b4-9549-e71a3766d8b5",
+                            Id = "de4c10e0-be8a-40bd-8679-9432184c1f50",
                             ConcurrencyStamp = "4",
                             Name = "Alumini",
                             NormalizedName = "Alumini"
                         },
                         new
                         {
-                            Id = "5b19139a-a6b9-4e0f-b9e0-364ab31b50aa",
+                            Id = "5edd025d-f6b6-4f04-b2a9-b0692f542203",
                             ConcurrencyStamp = "5",
                             Name = "Admin",
                             NormalizedName = "Admin"
