@@ -67,7 +67,7 @@ namespace UoNMarketPlace.Controllers
                     }
                     else if (roles.Contains("Alumini"))
                     {
-                        return RedirectToAction("AluminiLandingPage", "Alumini");
+                        return RedirectToAction("Forum", "Alumini");
                     }
                     else if (roles.Contains("Admin"))
                     {
