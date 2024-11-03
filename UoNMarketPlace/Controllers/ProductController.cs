@@ -4,20 +4,33 @@ using UoNMarketPlace.ViewModel;
 using UoNMarketPlace.Model;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace UoNMarketPlace.Controllers
 {
     public class ProductController : Controller
     {
         private readonly UoNDB _context;
-        public ProductController(UoNDB context)
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public ProductController(UoNDB context, UserManager<IdentityUser> userManager , RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         #region Landing Page
-        public IActionResult LandingPage()
+        public async Task<IActionResult> LandingPage()
         {
+            // Await the user retrieval task
+            var user = await _userManager.GetUserAsync(User);
+
+            // Now you can use the user object to get roles
+            var roles = await _userManager.GetRolesAsync(user);
+
+            ViewBag.Roles = roles; // Pass roles to the view
+
             return View();
         }
         #endregion
@@ -538,6 +551,70 @@ namespace UoNMarketPlace.Controllers
             return View();
         }
         #endregion
+
+        #region Forum
+        public IActionResult Forum()
+        {
+            var posts = _context.AlumniPosts
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.Replies)
+                        .ThenInclude(r => r.User) // Include the user for replies
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.User) // Include the user for comments
+                .Include(p => p.Likes)
+                .ToList();
+
+            return View(posts);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddComment(int postId, string commentText)
+        {
+            var comment = new Comment
+            {
+                PostId = postId,
+                Text = commentText,
+                DateCommented = DateTime.Now,
+                UserId = _userManager.GetUserId(User)
+            };
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Forum");
+        }
+        // Like a post
+        [HttpPost]
+        public async Task<IActionResult> LikePost(int postId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var like = new Like { PostId = postId, UserId = userId };
+
+            if (!_context.Likes.Any(l => l.PostId == postId && l.UserId == userId))
+            {
+                _context.Likes.Add(like);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Forum");
+        }
+        // Add a reply to a comment
+        [HttpPost]
+        public async Task<IActionResult> AddReply(int commentId, string replyText)
+        {
+            var reply = new Reply
+            {
+                CommentId = commentId,
+                Text = replyText,
+                DateReplied = DateTime.Now,
+                UserId = _userManager.GetUserId(User)
+            };
+            _context.Replies.Add(reply);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Forum");
+        }
+
+        #endregion
+
 
         #region Notification 
         public async Task<IActionResult> Notifications()

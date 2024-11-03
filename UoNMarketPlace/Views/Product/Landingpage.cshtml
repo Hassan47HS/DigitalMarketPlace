@@ -79,60 +79,6 @@
             </div>
         </div>
     </div>
-    @*     <div class="Navbar" style="width: 1336px; height: 88px; padding-left: 78px; padding-right: 78px; padding-top: 32px; padding-bottom: 32px; left: 292px; top: 35px; position: absolute; background: black; border-radius: 80px; overflow: visible; justify-content: space-between; align-items: center; display: inline-flex; z-index: 1;">
-    <!-- Brand Logo -->
-    <div class="Group6" style="width: 146.89px; height: 24px; position: relative">
-    <div style="width: 77.32px; height: 24px; left: 0px; top: -7px; position: absolute;" class="navbar-brand">
-    <span class="logo-glam">UON</span><span class="logo-mod">Marketplace</span>
-    </div>
-    </div>
-
-    <!-- Navigation Links -->
-    <div class="Name" style="height: 24px; justify-content: space-between; align-items: center; display: flex">
-    <!-- Forum Link -->
-    <li style="list-style: none; margin-right: 125px;">
-    <a asp-area="" asp-action="Forum" asp-controller="Alumini" class="Forum" style="text-decoration:none; text-align: center; color: white; font-size: 16px; font-family: Space Grotesk; font-weight: 500; text-transform: uppercase; line-height: 24px; word-wrap: break-word;">
-    Forum
-    </a>
-    </li>
-
-    <!-- Dashboard Link -->
-    <li style="list-style: none; margin-right: 125px;">
-    <a asp-action="SellerDashboard" asp-controller="Product" class="Dashboard" style="text-decoration:none; text-align: center; color: white; font-size: 16px; font-family: Space Grotesk; font-weight: 500; text-transform: uppercase; line-height: 24px; word-wrap: break-word;">
-    Dashboard
-    </a>
-    </li>
-
-    <li style="list-style: none; margin-right: 125px;">
-    <a asp-action="Notifications" asp-controller="Product" class="Dashboard" style="text-decoration:none; text-align: center; color: white; font-size: 16px; font-family: Space Grotesk; font-weight: 500; text-transform: uppercase; line-height: 24px; word-wrap: break-word;">
-    Notifications
-    </a>
-    </li>
-    <!-- Product Dropdown -->
-    <div class="dropdown" style="margin-right: 125px; position: relative;">
-    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration:none; color: white; font-size: 16px; font-family: Space Grotesk; font-weight: 500; text-transform: uppercase; line-height: 24px; text-align: center;">
-    Product
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-    <li><a class="dropdown-item" asp-action="Sell" asp-controller="Product">Sell</a></li>
-    <li><a class="dropdown-item" asp-action="Buy" asp-controller="Product">Buy</a></li>
-    </ul>
-    </div>
-
-    <!-- Logout Button -->
-    @if (SignInManager.IsSignedIn(User))
-    {
-    <li style="list-style: none; margin-left: 20px;">
-    <form method="post" asp-controller="Login" asp-action="Logout" style="display: inline;">
-    <button type="submit" style="background: none; border: none; color: white; font-size: 16px; text-transform: uppercase; cursor: pointer;">
-    Logout
-    </button>
-    </form>
-    </li>
-    }
-    </div>
-    </div>
-    *@
     @Html.Partial("_StudentNavbar");
 
 </div>
