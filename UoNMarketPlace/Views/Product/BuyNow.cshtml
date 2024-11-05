@@ -1,6 +1,8 @@
 ﻿@using System.Security.Claims
 @model UoNMarketPlace.ViewModel.ChatViewModel
 
+@Html.Partial("_StudentNavbar")
+
 <h2>Chat for Product #@Model.ProductId</h2>
 
 <div id="chat-container" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc;">

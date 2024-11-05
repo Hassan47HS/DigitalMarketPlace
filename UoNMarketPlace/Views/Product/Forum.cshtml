@@ -1,4 +1,6 @@
-﻿@model IEnumerable<UoNMarketPlace.Model.AlumniPost>
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@model IEnumerable<UoNMarketPlace.Model.AlumniPost>
 
 <!-- Navbar -->
 <!-- Include Navbar Partial -->
@@ -9,6 +11,9 @@
 
     @foreach (var post in Model)
     {
+        var userId = UserManager.GetUserId(User); // Get the current user ID
+        var hasLiked = post.Likes.Any(like => like.UserId == userId); // Check if user liked this post
+
         <div class="card mb-4 shadow-sm border-0 rounded-3 p-3">
             <div class="card-body">
                 <h5 class="card-title text-dark fw-bold">@post.Title</h5>
@@ -28,7 +33,16 @@
                 <!-- Like Button -->
                 <form asp-action="LikePost" method="post" class="d-inline-block me-2">
                     <input type="hidden" name="postId" value="@post.Id" />
-                    <button type="submit" class="btn btn-outline-primary btn-sm">Like</button>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                        @if (hasLiked)
+                        {
+                            <span>Liked</span>
+                        }
+                        else
+                        {
+                            <span>Like</span>
+                        }
+                    </button>
                 </form>
 
                 <!-- Add Comment Form -->

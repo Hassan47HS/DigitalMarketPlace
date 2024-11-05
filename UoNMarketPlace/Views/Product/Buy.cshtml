@@ -4,7 +4,7 @@
     ViewData["Title"] = "Buy Products";
 }
 
-@Html.Partial("_StudentNavbar");
+@Html.Partial("_StudentNavbar")
 
 
 <div class="container py-5">
@@ -46,7 +46,7 @@
                             <h5 class="card-title text-center">@product.Name</h5>
                             <p class="card-text text-center text-muted">@product.Description</p>
                             <div class="mt-auto">
-                                <p class="fw-bold text-center text-primary">@product.Price.ToString("C")</p>
+                                <p class="fw-bold text-center text-primary">$@($"{product.Price}")</p>
                                 <div class="d-flex justify-content-center gap-2">
                                     <a href="@Url.Action("ProductDetails", "Product", new { id = product.Id })"
                                        class="btn btn-primary w-100">
@@ -66,7 +66,7 @@
     </div>
 
     <footer class="mt-5 text-center">
-        <p class="text-muted">©️ 2023 Student Marketplace. All rights reserved.</p>
+        <p class="text-muted">©️ 2024 Student Marketplace. All rights reserved.</p>
     </footer>
 </div>
 
