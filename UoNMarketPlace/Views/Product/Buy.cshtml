@@ -22,9 +22,8 @@
             <option value="Electronics" selected="@(Context.Request.Query["category"] == "Electronics" ? "selected" : "")">Electronics</option>
             <option value="Clothing" selected="@(Context.Request.Query["category"] == "Clothing" ? "selected" : "")">Clothing</option>
             <option value="Books" selected="@(Context.Request.Query["category"] == "Books" ? "selected" : "")">Books</option>
-            <option value="Books" selected="@(Context.Request.Query["category"] == "Vehicle" ? "selected" : "")">Vehicle</option>
-            <option value="Books" selected="@(Context.Request.Query["category"] == "Accommodation" ? "selected" : "")">Accommodation</option>
-
+            <option value="Vehicle" selected="@(Context.Request.Query["category"] == "Vehicle" ? "selected" : "")">Vehicle</option>
+            <option value="Accommodation" selected="@(Context.Request.Query["category"] == "Accommodation" ? "selected" : "")">Accommodation</option>
         </select>
 
         <button type="submit" class="btn btn-primary">Search</button>

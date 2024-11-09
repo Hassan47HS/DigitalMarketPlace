@@ -92,7 +92,7 @@ namespace UoNMarketPlace.Controllers
             }
 
             // Apply category filter
-            else if (!string.IsNullOrEmpty(category))
+            if (!string.IsNullOrEmpty(category))
             {
                 products = products.Where(p => p.Category == category);
             }
